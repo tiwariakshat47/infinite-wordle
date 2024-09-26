@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wordle Clone</title>
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+    <div id="wordle-grid">
+        <!-- 6 rows for 6 guesses -->
+        <div class="row">
+            <input type="text" maxlength="1" class="letter" id="0-0">
+            <input type="text" maxlength="1" class="letter" id="0-1">
+            <input type="text" maxlength="1" class="letter" id="0-2">
+            <input type="text" maxlength="1" class="letter" id="0-3">
+            <input type="text" maxlength="1" class="letter" id="0-4">
+        </div>
+        <div class="row">
+            <input type="text" maxlength="1" class="letter" id="1-0">
+            <input type="text" maxlength="1" class="letter" id="1-1">
+            <input type="text" maxlength="1" class="letter" id="1-2">
+            <input type="text" maxlength="1" class="letter" id="1-3">
+            <input type="text" maxlength="1" class="letter" id="1-4">
+        </div>
+        <div class="row">
+            <input type="text" maxlength="1" class="letter" id="2-0">
+            <input type="text" maxlength="1" class="letter" id="2-1">
+            <input type="text" maxlength="1" class="letter" id="2-2">
+            <input type="text" maxlength="1" class="letter" id="2-3">
+            <input type="text" maxlength="1" class="letter" id="2-4">
+        </div>
+        <div class="row">
+            <input type="text" maxlength="1" class="letter" id="3-0">
+            <input type="text" maxlength="1" class="letter" id="3-1">
+            <input type="text" maxlength="1" class="letter" id="3-2">
+            <input type="text" maxlength="1" class="letter" id="3-3">
+            <input type="text" maxlength="1" class="letter" id="3-4">
+        </div>
+        <div class="row">
+            <input type="text" maxlength="1" class="letter" id="4-0">
+            <input type="text" maxlength="1" class="letter" id="4-1">
+            <input type="text" maxlength="1" class="letter" id="4-2">
+            <input type="text" maxlength="1" class="letter" id="4-3">
+            <input type="text" maxlength="1" class="letter" id="4-4">
+        </div>
+        <div class="row">
+            <input type="text" maxlength="1" class="letter" id="5-0">
+            <input type="text" maxlength="1" class="letter" id="5-1">
+            <input type="text" maxlength="1" class="letter" id="5-2">
+            <input type="text" maxlength="1" class="letter" id="5-3">
+            <input type="text" maxlength="1" class="letter" id="5-4">
+        </div>
+        <button onclick="submitGuess()">Submit Guess</button>
+    </div>
+
+    <script>
+        let currentRow = 0;
+        const maxRows = 6;
+
+        function submitGuess() {
+            if (currentRow >= maxRows) {
+                alert('You have no more guesses left!');
+                return;
+            }
+
+            let guess = '';
+            for (let i = 0; i < 5; i++) {
+                guess += document.getElementById(currentRow + '-' + i).value;
+            }
+
+            fetch('/check', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ guess: guess }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Update the colors based on the server's response
+                for (let i = 0; i < data.length; i++) {
+                    document.getElementById(currentRow + '-' + i).style.backgroundColor = data[i];
+                }
+
+                if (data.every(color => color === 'green')) {
+                    alert('Congratulations! You guessed the word!');
+                } else if (currentRow + 1 >= maxRows) {
+                    alert('Game over! You\'ve used all your guesses.');
+                } else {
+                    currentRow++;
+                }
+            });
+        }
+    </script>
+</body>
+</html>
